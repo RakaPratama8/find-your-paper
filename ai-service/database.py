@@ -8,25 +8,31 @@ DB_USER = os.getenv("DB_USER", "fyp_user")
 DB_PASSWORD = os.getenv("DB_PASSWORD", "fyp_password")
 DB_NAME = os.getenv("DB_NAME", "fyp_db")
 
-def get_connection():
-    conn = psycopg2.connect(
+def get_raw_connection():
+    """Returns a raw PG connection without attempting to register pgvector schemas yet."""
+    return psycopg2.connect(
         host=DB_HOST,
         port=DB_PORT,
         user=DB_USER,
         password=DB_PASSWORD,
         dbname=DB_NAME
     )
+
+def get_connection():
+    """Returns a PG connection with pgvector decoders loaded. Fails if extension doesn't exist."""
+    conn = get_raw_connection()
     register_vector(conn)
     return conn
 
 def init_db():
     conn = None
     try:
-        conn = get_connection()
+        # Use raw connection here to bootstrap the DB before pgvector is actually loaded!
+        conn = get_raw_connection()
         cur = conn.cursor()
         cur.execute("CREATE EXTENSION IF NOT EXISTS vector;")
         
-        # Dimension is 384 for all-MiniLM-L6-v2
+        # Now we can safely establish the vector datatype table
         cur.execute("""
             CREATE TABLE IF NOT EXISTS papers (
                 openalex_id TEXT PRIMARY KEY,
