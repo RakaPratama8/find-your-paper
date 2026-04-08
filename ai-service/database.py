@@ -1,0 +1,52 @@
+import os
+import psycopg2
+from pgvector.psycopg2 import register_vector
+
+DB_HOST = os.getenv("DB_HOST", "localhost")
+DB_PORT = os.getenv("DB_PORT", "5432")
+DB_USER = os.getenv("DB_USER", "fyp_user")
+DB_PASSWORD = os.getenv("DB_PASSWORD", "fyp_password")
+DB_NAME = os.getenv("DB_NAME", "fyp_db")
+
+def get_connection():
+    conn = psycopg2.connect(
+        host=DB_HOST,
+        port=DB_PORT,
+        user=DB_USER,
+        password=DB_PASSWORD,
+        dbname=DB_NAME
+    )
+    register_vector(conn)
+    return conn
+
+def init_db():
+    conn = None
+    try:
+        conn = get_connection()
+        cur = conn.cursor()
+        cur.execute("CREATE EXTENSION IF NOT EXISTS vector;")
+        
+        # Dimension is 384 for all-MiniLM-L6-v2
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS papers (
+                openalex_id TEXT PRIMARY KEY,
+                title TEXT,
+                doi TEXT,
+                abstract TEXT,
+                publication_year INTEGER,
+                authors TEXT[],
+                author_names TEXT,
+                embedding vector(384)
+            );
+        """)
+        conn.commit()
+        cur.close()
+        print("Database initialized successfully.")
+    except Exception as e:
+        print(f"Error initializing DB: {e}")
+    finally:
+        if conn:
+            conn.close()
+
+if __name__ == "__main__":
+    init_db()
