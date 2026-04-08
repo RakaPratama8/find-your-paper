@@ -3,7 +3,7 @@ import psycopg2
 from pgvector.psycopg2 import register_vector # type: ignore
 
 DB_HOST = os.getenv("DB_HOST", "localhost")
-DB_PORT = os.getenv("DB_PORT", "5432")
+DB_PORT = os.getenv("DB_PORT", "5433")
 DB_USER = os.getenv("DB_USER", "fyp_user")
 DB_PASSWORD = os.getenv("DB_PASSWORD", "fyp_password")
 DB_NAME = os.getenv("DB_NAME", "fyp_db")
