@@ -52,7 +52,6 @@ def _rebuild_abstract(inverted_index: Dict[str, List[int]]) -> str:
     if not inverted_index:
         return ""
         
-    # Find the maximum word index to size our array
     max_idx = max([idx for positions in inverted_index.values() for idx in positions])
     words = [""] * (max_idx + 1)
     

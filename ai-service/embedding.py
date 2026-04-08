@@ -1,8 +1,6 @@
 from sentence_transformers import SentenceTransformer  # type: ignore
 import numpy as np
 
-# Load a fast, lightweight open-source embedding model
-# all-MiniLM-L6-v2 outputs 384-dimensional vectors
 print("Loading model. This might take a moment on first run...")
 model = SentenceTransformer('all-MiniLM-L6-v2')
 print("Model loaded successfully.")
@@ -23,22 +21,19 @@ def extract_highlighted_sentence(query: str, abstract: str) -> str:
         
     query_emb = model.encode(query)
     
-    # Simple chunking by period for MVP.
     sentences = [s.strip() + "." for s in abstract.split(".") if len(s.strip()) > 5]
     if not sentences:
         return abstract
 
     sentence_embs = model.encode(sentences)
     
-    # Compute cosine similarities
     similarities = model.similarity(query_emb, sentence_embs)[0]
     best_idx = int(np.argmax(similarities))
     
     best_sentence = sentences[best_idx]
     
-    # Highlight the best sentence in the generic abstract
     highlighted_abstract = abstract.replace(
-        best_sentence[:-1], # Remove trailing period for safer matching
+        best_sentence[:-1], 
         f"<mark>{best_sentence[:-1]}</mark>"
     )
     

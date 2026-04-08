@@ -12,7 +12,6 @@ interface PaperProps {
 }
 
 export default function PaperCard({ paper }: PaperProps) {
-  // Score interpretation
   let badgeClass = 'similarity-medium';
   let scoreLabel = 'Medium Relevance';
   
@@ -21,7 +20,6 @@ export default function PaperCard({ paper }: PaperProps) {
     scoreLabel = 'High Relevance';
   }
 
-  // Calculate percentage
   const scorePercent = (paper.similarity_score * 100).toFixed(0) + '%';
 
   return (

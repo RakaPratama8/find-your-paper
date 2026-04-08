@@ -6,7 +6,6 @@ function App() {
   const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
-    // Check if user is logged in
     const storedToken = localStorage.getItem('token');
     if (storedToken) {
       setToken(storedToken);

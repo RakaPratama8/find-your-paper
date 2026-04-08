@@ -1,7 +1,6 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException  # type: ignore
 from pydantic import BaseModel
 from typing import List, Optional
-import psycopg2
 
 from database import get_connection, init_db
 from embedding import get_embedding, extract_highlighted_sentence
@@ -9,7 +8,6 @@ from openalex import fetch_papers
 
 app = FastAPI(title="FYP AI Service")
 
-# Ensure DB is ready on startup
 @app.on_event("startup")
 def on_startup():
     init_db()
@@ -40,13 +38,9 @@ def semantic_search(req: SearchRequest):
         conn = get_connection()
         cur = conn.cursor()
         
-        # 1. Fetch papers from OpenAlex
         papers = fetch_papers(req.text, req.min_year, req.top_k)
         
-        # 2. Embed & Save them in PGVector for fast similarity
-        # Here we embed the abstract (or title + abstract)
         for p in papers:
-            # Check if exists to avoid duplicated embedding computations
             cur.execute("SELECT openalex_id FROM papers WHERE openalex_id = %s", (p['openalex_id'],))
             if cur.fetchone() is None:
                 emb = get_embedding(p['title'] + ". " + p['abstract'])
@@ -58,10 +52,8 @@ def semantic_search(req: SearchRequest):
                 """, (p['openalex_id'], p['title'], p['doi'], p['abstract'], p['publication_year'], p['authors'], authors_str, emb))
         conn.commit()
         
-        # 3. Perform Vector Search based on the User's Query Vector
         query_emb = get_embedding(req.text)
         
-        # <=> is the 1 - cosine similarity operator in pgvector
         cur.execute("""
             SELECT openalex_id, title, doi, abstract, publication_year, author_names, 1 - (embedding <=> %s::vector) AS similarity
             FROM papers

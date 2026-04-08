@@ -27,12 +27,10 @@ def get_connection():
 def init_db():
     conn = None
     try:
-        # Use raw connection here to bootstrap the DB before pgvector is actually loaded!
         conn = get_raw_connection()
         cur = conn.cursor()
         cur.execute("CREATE EXTENSION IF NOT EXISTS vector;")
         
-        # Now we can safely establish the vector datatype table
         cur.execute("""
             CREATE TABLE IF NOT EXISTS papers (
                 openalex_id TEXT PRIMARY KEY,
