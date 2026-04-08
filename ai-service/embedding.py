@@ -1,4 +1,4 @@
-from sentence_transformers import SentenceTransformer
+from sentence_transformers import SentenceTransformer  # type: ignore
 import numpy as np
 
 # Load a fast, lightweight open-source embedding model

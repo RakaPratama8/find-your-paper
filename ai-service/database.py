@@ -1,6 +1,6 @@
 import os
 import psycopg2
-from pgvector.psycopg2 import register_vector
+from pgvector.psycopg2 import register_vector # type: ignore
 
 DB_HOST = os.getenv("DB_HOST", "localhost")
 DB_PORT = os.getenv("DB_PORT", "5432")
