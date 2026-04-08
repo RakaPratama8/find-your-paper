@@ -72,7 +72,7 @@ export default function Search({ token, onLogout }: SearchProps) {
             value={years}
             min={1}
             max={50}
-            onChange={(e) => setYears(parseInt(e.target.value))}
+            onChange={(e) => setYears(parseInt(e.target.value) || 5)}
             title="Years looking back"
           />
           <button type="submit" className="search-submit" disabled={loading}>
