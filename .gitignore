@@ -50,3 +50,4 @@ venv.bak/
 # Docker
 docker-compose.override.yml
 .docker-volumes/
+DEPLOYMENT_GUIDE.md
